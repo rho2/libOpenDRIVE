@@ -40,7 +40,7 @@ add_library(OpenDrive
     src/RoutingGraph.cpp
     Thirdparty/pugixml/pugixml.cpp
 )
-
+add_library(OpenDrive::OpenDrive ALIAS OpenDrive)
 target_include_directories(OpenDrive PUBLIC include Thirdparty)
 target_compile_features(OpenDrive PUBLIC cxx_std_14)
 
