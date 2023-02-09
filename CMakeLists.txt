@@ -5,23 +5,22 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 project(libOpenDrive VERSION 0.1.0 DESCRIPTION ".xodr library")
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-set(CMAKE_CXX_FLAGS "-Wall")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+option(LIB_OPEN_DRIVE_BUILD_TESTS OFF)
+option(BUILD_SHARED_LIBS OFF)
 
-if(MSVC)
-SET(CMAKE_CXX_FLAGS "/EHsc")
-SET(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
-else()
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
+if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+  set(CMAKE_CXX_FLAGS "-Wall")
+  set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+  if(MSVC)
+    SET(CMAKE_CXX_FLAGS "/EHsc")
+    SET(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
+  else()
+    set(CMAKE_CXX_FLAGS_DEBUG "-g")
+  endif()
 endif()
 
-include_directories(include)
-include_directories(Thirdparty)
-
-add_library(OpenDrive SHARED
+add_library(OpenDrive
     src/Geometries/Arc.cpp
     src/Geometries/CubicSpline.cpp
     src/Geometries/Line.cpp
@@ -41,6 +40,9 @@ add_library(OpenDrive SHARED
     src/RoutingGraph.cpp
     Thirdparty/pugixml/pugixml.cpp
 )
+
+target_include_directories(OpenDrive PUBLIC include Thirdparty)
+target_compile_features(OpenDrive PUBLIC cxx_std_14)
 
 if(EMSCRIPTEN)
     set(CMAKE_EXECUTABLE_SUFFIX ".js")
@@ -62,7 +64,7 @@ if(EMSCRIPTEN)
     ")
 endif()
 
-if(NOT EMSCRIPTEN)
+if(NOT EMSCRIPTEN AND LIB_OPEN_DRIVE_BUILD_TESTS)
     add_executable(test-xodr test.cpp)
     target_link_libraries(test-xodr OpenDrive)
 endif()
